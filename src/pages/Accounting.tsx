@@ -114,8 +114,8 @@ export default function Accounting() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Accounting</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Accounting</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Manage accounts, journal entries, and financial statements
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function Accounting() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.title} className="shadow-soft">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -210,7 +210,8 @@ export default function Accounting() {
             <CardTitle>Recent Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -249,6 +250,44 @@ export default function Accounting() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {transactions.map((txn) => (
+                <div key={txn.id} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm">{txn.id}</p>
+                      <p className="text-xs text-muted-foreground">{txn.date}</p>
+                    </div>
+                    {getTypeBadge(txn.type)}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Account:</span>
+                      <span className="font-medium">{txn.account}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Amount:</span>
+                      <span className="font-bold text-lg">{txn.amount}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{txn.description}</p>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(txn)}>
+                      <Edit className="h-4 w-4 text-primary" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(txn.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

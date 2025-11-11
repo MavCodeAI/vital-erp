@@ -221,12 +221,10 @@ export default function Sales() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Sales</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage invoices, quotes, and payments
-            </p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Sales</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Manage invoices and sales orders</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -235,7 +233,7 @@ export default function Sales() {
                 New Invoice
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="text-2xl">{editingId ? "Edit Invoice" : "Create New Invoice"}</DialogTitle>
               </DialogHeader>
@@ -284,11 +282,13 @@ export default function Sales() {
                     <Label className="text-base font-semibold">Invoice Items</Label>
                     <Button type="button" variant="outline" size="sm" onClick={addItem}>
                       <Plus className="h-4 w-4 mr-1" />
-                      Add Item
+                      <span className="hidden sm:inline">Add Item</span>
+                      <span className="sm:hidden">Add</span>
                     </Button>
                   </div>
                   
-                  <div className="border rounded-lg overflow-hidden">
+                  {/* Desktop View */}
+                  <div className="hidden md:block border rounded-lg overflow-hidden">
                     <div className="bg-muted/50 grid grid-cols-12 gap-2 p-3 text-sm font-semibold">
                       <div className="col-span-4">Product</div>
                       <div className="col-span-2 text-center">Quantity</div>
@@ -368,6 +368,81 @@ export default function Sales() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Mobile View */}
+                  <div className="md:hidden space-y-3">
+                    {items.map((item, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                        <div className="flex justify-between items-start">
+                          <span className="text-sm font-semibold text-muted-foreground">Item #{index + 1}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => removeItem(index)}
+                            disabled={items.length === 1}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs">Product</Label>
+                          <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            value={item.productId || ""}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                selectProduct(index, e.target.value);
+                              } else {
+                                updateItem(index, "description", "");
+                              }
+                            }}
+                          >
+                            <option value="">Select product</option>
+                            {availableProducts.map(product => (
+                              <option key={product.id} value={product.id} disabled={product.stock === 0}>
+                                {product.name} - Rs {product.price.toLocaleString()}
+                              </option>
+                            ))}
+                          </select>
+                          {!item.productId && (
+                            <Input
+                              placeholder="Or enter custom description"
+                              value={item.description}
+                              onChange={(e) => updateItem(index, "description", e.target.value)}
+                              className="text-sm"
+                            />
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={item.quantity}
+                              onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value) || 0)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Rate (Rs)</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.rate}
+                              onChange={(e) => updateItem(index, "rate", parseFloat(e.target.value) || 0)}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t">
+                          <span className="text-sm font-medium">Amount:</span>
+                          <span className="text-lg font-bold">Rs {item.amount.toLocaleString('en-PK', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Calculations */}
@@ -443,7 +518,7 @@ export default function Sales() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.title} className="shadow-soft">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -465,7 +540,8 @@ export default function Sales() {
             <CardTitle>Recent Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -508,6 +584,43 @@ export default function Sales() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {invoices.map((invoice) => (
+                <div key={invoice.id} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm">{invoice.id}</p>
+                      <p className="text-sm text-muted-foreground">{invoice.customer}</p>
+                    </div>
+                    {getStatusBadge(invoice.status)}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">{invoice.date}</span>
+                    <span className="font-bold text-lg">{invoice.amount}</span>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleView(invoice)}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    {invoice.status !== "paid" && (
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => handlePayment(invoice)}>
+                        <DollarSign className="h-4 w-4 mr-1" />
+                        Pay
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(invoice)}>
+                      <Edit className="h-4 w-4 text-primary" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(invoice.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -534,12 +647,12 @@ export default function Sales() {
                 </div>
 
                 {/* Customer Info */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <p className="text-sm font-semibold text-muted-foreground">Bill To:</p>
                     <p className="text-lg font-semibold mt-1">{selectedInvoice.customer}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="sm:text-right">
                     <p className="text-sm font-semibold text-muted-foreground">Status:</p>
                     <div className="mt-1">{getStatusBadge(selectedInvoice.status)}</div>
                   </div>
@@ -554,7 +667,7 @@ export default function Sales() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                   <Button className="flex-1" variant="outline" onClick={shareInvoice}>
                     Share Invoice
                   </Button>

@@ -119,8 +119,8 @@ export default function Purchase() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Purchase</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Purchase</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Manage purchase orders and vendor relationships
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function Purchase() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="po-items">Items</Label>
-                  <Input id="po-items" placeholder="Add purchase items..." value={items} onChange={(e) => setItems(e.target.value)} />
+                  <Input id="po-items" placeholder="Add purchase items..." />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="amount">Total Amount (Rs) *</Label>
@@ -186,7 +186,7 @@ export default function Purchase() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="po-notes">Notes</Label>
-                  <Input id="po-notes" placeholder="Additional notes..." value={notes} onChange={(e) => setNotes(e.target.value)} />
+                  <Input id="po-notes" placeholder="Additional notes..." />
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => { resetForm(); setOpen(false); }}>Cancel</Button>
@@ -200,7 +200,7 @@ export default function Purchase() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.title} className="shadow-soft">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -222,7 +222,8 @@ export default function Purchase() {
             <CardTitle>Recent Purchase Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -264,6 +265,43 @@ export default function Purchase() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {orders.map((po) => (
+                <div key={po.id} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm">{po.id}</p>
+                      <p className="text-sm text-muted-foreground">{po.vendor}</p>
+                    </div>
+                    {getStatusBadge(po.status)}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">{po.date}</span>
+                    <span className="font-bold text-lg">{po.amount}</span>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    {po.status === "pending" && (
+                      <Button variant="outline" size="sm" className="flex-1" onClick={() => handleReceive(po.id)}>
+                        <CheckCircle2 className="h-4 w-4 mr-1" />
+                        Receive
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(po)}>
+                      <Edit className="h-4 w-4 text-primary" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(po.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

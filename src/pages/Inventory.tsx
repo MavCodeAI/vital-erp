@@ -116,8 +116,8 @@ export default function Inventory() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Inventory</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Track stock levels, warehouses, and inventory movements
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function Inventory() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.title} className="shadow-soft">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -220,7 +220,8 @@ export default function Inventory() {
             <CardTitle>Inventory Items</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -259,6 +260,45 @@ export default function Inventory() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {items.map((item) => (
+                <div key={item.id} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm">{item.id}</p>
+                      <p className="text-base font-medium">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">SKU: {item.sku}</p>
+                    </div>
+                    {getStatusBadge(item.status)}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-muted-foreground text-xs">Quantity</p>
+                      <p className="font-semibold">{item.quantity}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs">Warehouse</p>
+                      <p className="font-semibold">{item.warehouse}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEdit(item)}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

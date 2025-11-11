@@ -77,13 +77,13 @@ export default function Welcome() {
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-5xl font-bold tracking-tight lg:text-6xl">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight lg:text-6xl">
                   Enterprise Resource Planning
                   <span className="block bg-gradient-primary bg-clip-text text-transparent mt-2">
                     Made Simple
                   </span>
                 </h1>
-                <p className="text-xl text-muted-foreground max-w-xl">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl">
                   Complete business management solution with 11 integrated modules. 
                   Manage sales, inventory, accounting, HR, and more from a single platform.
                 </p>
@@ -132,15 +132,15 @@ export default function Welcome() {
       {/* Features Grid */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">
             Everything You Need to Run Your Business
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             11 comprehensive modules working together seamlessly to give you complete control
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {features.map((feature) => (
             <Card 
               key={feature.title}
@@ -165,9 +165,9 @@ export default function Welcome() {
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-20">
         <Card className="shadow-elevated bg-gradient-primary text-white border-0">
-          <CardContent className="p-12 text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Business?</h2>
-            <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+          <CardContent className="p-6 sm:p-8 md:p-12 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Ready to Transform Your Business?</h2>
+            <p className="text-white/90 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
               Join thousands of businesses managing their operations efficiently with ErpMax
             </p>
             <Button 

@@ -111,8 +111,8 @@ export default function Parties() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Parties</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Parties</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Manage customers, vendors, and contacts
             </p>
           </div>
@@ -187,7 +187,7 @@ export default function Parties() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <Card key={stat.title} className="shadow-soft">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -209,7 +209,8 @@ export default function Parties() {
             <CardTitle>All Parties</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -248,6 +249,42 @@ export default function Parties() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {parties.map((party) => (
+                <div key={party.id} className="border rounded-lg p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-sm">{party.id}</p>
+                      <p className="text-base font-medium">{party.name}</p>
+                    </div>
+                    {getTypeBadge(party.type)}
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p className="text-muted-foreground">{party.email}</p>
+                    <p className="text-muted-foreground">{party.phone}</p>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-xs text-muted-foreground">Balance:</span>
+                      <span className="font-bold text-lg">{party.balance}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEdit(party)}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(party.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

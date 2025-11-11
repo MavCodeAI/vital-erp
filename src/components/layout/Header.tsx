@@ -25,8 +25,8 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search across modules..."
-            className="pl-10"
+            placeholder="Search..."
+            className="pl-10 text-sm sm:text-base"
           />
         </div>
       </div>

@@ -61,14 +61,14 @@ export default function Dashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Welcome back! Here's what's happening with your business today.
           </p>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {kpis.map((kpi) => (
             <Card key={kpi.title} className="shadow-soft hover:shadow-elevated transition-all">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -80,15 +80,15 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{kpi.value}</div>
-                <div className="flex items-center gap-1 text-sm mt-1">
+                <div className="text-xl sm:text-2xl font-bold">{kpi.value}</div>
+                <div className="flex items-center gap-1 text-xs sm:text-sm mt-1">
                   {kpi.trend === "up" ? (
-                    <ArrowUpRight className={`h-4 w-4 ${kpi.color}`} />
+                    <ArrowUpRight className={`h-3 w-3 sm:h-4 sm:w-4 ${kpi.color}`} />
                   ) : (
-                    <ArrowDownRight className={`h-4 w-4 ${kpi.color}`} />
+                    <ArrowDownRight className={`h-3 w-3 sm:h-4 sm:w-4 ${kpi.color}`} />
                   )}
                   <span className={kpi.color}>{kpi.change}</span>
-                  <span className="text-muted-foreground">from last month</span>
+                  <span className="text-muted-foreground hidden sm:inline">from last month</span>
                 </div>
               </CardContent>
             </Card>
@@ -96,13 +96,13 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           <Card className="shadow-soft">
             <CardHeader>
               <CardTitle>Revenue Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={revenueData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -123,7 +123,7 @@ export default function Dashboard() {
               <CardTitle>Sales by Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[250px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={salesData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -146,15 +146,15 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <ShoppingCart className="h-5 w-5 text-primary" />
+                <div key={i} className="flex items-start gap-3 sm:gap-4 pb-4 border-b last:border-0 last:pb-0">
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">New order received</p>
-                    <p className="text-sm text-muted-foreground">Order #INV-{1000 + i} from Customer Name</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">Order #INV-{1000 + i} from Customer Name</p>
                   </div>
-                  <div className="text-sm text-muted-foreground">2h ago</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">2h ago</div>
                 </div>
               ))}
             </div>

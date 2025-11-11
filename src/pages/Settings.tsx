@@ -13,8 +13,8 @@ export default function Settings() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Configure system preferences and company settings
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
           {/* Appearance */}
           <Card className="shadow-soft">
             <CardHeader>
