@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,6 +10,28 @@ import { Building2, Bell, Shield, Palette, Database, Mail, Globe, Save, Download
 import { showSuccess } from "@/lib/toast";
 
 export default function Settings() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Check current theme
+    const theme = localStorage.getItem("theme");
+    setIsDarkMode(theme === "dark");
+  }, []);
+
+  const handleDarkModeToggle = (checked: boolean) => {
+    setIsDarkMode(checked);
+    
+    if (checked) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    
+    showSuccess(`${checked ? "Dark" : "Light"} mode enabled!`);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -158,12 +181,21 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Dark Mode</Label>
-                <Switch />
+                <div className="space-y-0.5">
+                  <Label>Dark Mode</Label>
+                  <p className="text-sm text-muted-foreground">Switch between light and dark theme</p>
+                </div>
+                <Switch 
+                  checked={isDarkMode}
+                  onCheckedChange={handleDarkModeToggle}
+                />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
-                <Label>Compact View</Label>
+                <div className="space-y-0.5">
+                  <Label>Compact View</Label>
+                  <p className="text-sm text-muted-foreground">Reduce spacing for more content</p>
+                </div>
                 <Switch />
               </div>
             </CardContent>
