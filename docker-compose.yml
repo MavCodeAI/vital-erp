@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Production service
+  erp-production:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-max-production
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Staging service
+  erp-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-max-staging
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=staging
+    restart: unless-stopped
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  erp-network:
+    driver: bridge
