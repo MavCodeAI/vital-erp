@@ -10,40 +10,102 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, FolderKanban, CheckCircle2, Clock, AlertCircle, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, FolderKanban, CheckCircle2, Clock, AlertCircle, Eye, Edit, Trash2, FileSpreadsheet, FileDown, ArrowUpRight, ArrowDownRight, Search, Calendar, Users, DollarSign, TrendingUp } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
+import { exportToPDF, exportToExcel, exportSingleRecordPDF } from "@/lib/pdfExport";
 
 const stats = [
-  { title: "Total Projects", value: "24", icon: FolderKanban, color: "text-primary" },
-  { title: "Completed", value: "18", icon: CheckCircle2, color: "text-success" },
-  { title: "In Progress", value: "5", icon: Clock, color: "text-warning" },
-  { title: "Overdue", value: "1", icon: AlertCircle, color: "text-destructive" },
+  { title: "Total Projects", value: "24", change: "+3", trend: "up", icon: FolderKanban, color: "text-success", bgColor: "bg-blue-500/10" },
+  { title: "Completed", value: "18", change: "+5", trend: "up", icon: CheckCircle2, color: "text-success", bgColor: "bg-green-500/10" },
+  { title: "In Progress", value: "5", change: "-2", trend: "down", icon: Clock, color: "text-warning", bgColor: "bg-yellow-500/10" },
+  { title: "Overdue", value: "1", change: "-1", trend: "down", icon: AlertCircle, color: "text-destructive", bgColor: "bg-red-500/10" },
+  { title: "Team Members", value: "42", change: "+6", trend: "up", icon: Users, color: "text-primary", bgColor: "bg-purple-500/10" },
+  { title: "Budget Used", value: "Rs 45M", change: "+12%", trend: "up", icon: DollarSign, color: "text-success", bgColor: "bg-pink-500/10" },
+];
+
+const projectStatusData = [
+  { name: "Completed", value: 18, color: "hsl(142, 76%, 36%)" },
+  { name: "In Progress", value: 5, color: "hsl(48, 96%, 53%)" },
+  { name: "Overdue", value: 1, color: "hsl(0, 84%, 60%)" },
+];
+
+const monthlyProgressData = [
+  { month: "Jan", completed: 2, started: 3 },
+  { month: "Feb", completed: 3, started: 2 },
+  { month: "Mar", completed: 4, started: 4 },
+  { month: "Apr", completed: 3, started: 3 },
+  { month: "May", completed: 4, started: 2 },
+  { month: "Jun", completed: 2, started: 1 },
+];
+
+const budgetData = [
+  { category: "Development", budget: 18000000 },
+  { category: "Design", budget: 8500000 },
+  { category: "Marketing", budget: 12000000 },
+  { category: "Infrastructure", budget: 6500000 },
 ];
 
 const initialProjects = [
-  { id: "PRJ-001", name: "Website Redesign", client: "Karachi Corporation", progress: 75, deadline: "2024-02-15", status: "in-progress" },
-  { id: "PRJ-002", name: "Mobile App Development", client: "Lahore Tech Solutions", progress: 100, deadline: "2024-01-30", status: "completed" },
-  { id: "PRJ-003", name: "ERP Implementation", client: "Islamabad Industries", progress: 45, deadline: "2024-03-20", status: "in-progress" },
-  { id: "PRJ-004", name: "Cloud Migration", client: "Faisalabad Systems", progress: 30, deadline: "2024-01-10", status: "overdue" },
-  { id: "PRJ-005", name: "Data Analytics Platform", client: "Rawalpindi Media", progress: 60, deadline: "2024-02-28", status: "in-progress" },
+  { id: "PRJ-001", name: "Website Redesign", client: "Karachi Corporation", budget: "Rs 2,500,000", team: 5, progress: 75, startDate: "2023-11-01", deadline: "2024-02-15", status: "in-progress" },
+  { id: "PRJ-002", name: "Mobile App Development", client: "Lahore Tech Solutions", budget: "Rs 4,200,000", team: 8, progress: 100, startDate: "2023-09-15", deadline: "2024-01-30", status: "completed" },
+  { id: "PRJ-003", name: "ERP Implementation", client: "Islamabad Industries", budget: "Rs 8,500,000", team: 12, progress: 45, startDate: "2023-12-01", deadline: "2024-03-20", status: "in-progress" },
+  { id: "PRJ-004", name: "Cloud Migration", client: "Faisalabad Systems", budget: "Rs 3,200,000", team: 6, progress: 30, startDate: "2023-10-10", deadline: "2024-01-10", status: "overdue" },
+  { id: "PRJ-005", name: "Data Analytics Platform", client: "Rawalpindi Media", budget: "Rs 5,800,000", team: 9, progress: 60, startDate: "2023-11-20", deadline: "2024-02-28", status: "in-progress" },
+  { id: "PRJ-006", name: "CRM System", client: "Multan Enterprises", budget: "Rs 3,800,000", team: 7, progress: 100, startDate: "2023-08-01", deadline: "2024-01-15", status: "completed" },
+  { id: "PRJ-007", name: "E-commerce Platform", client: "Peshawar Retail", budget: "Rs 6,500,000", team: 10, progress: 85, startDate: "2023-10-15", deadline: "2024-02-20", status: "in-progress" },
+  { id: "PRJ-008", name: "Inventory Management", client: "Quetta Logistics", budget: "Rs 2,800,000", team: 5, progress: 100, startDate: "2023-09-01", deadline: "2024-01-10", status: "completed" },
+  { id: "PRJ-009", name: "HR Portal", client: "Sialkot Industries", budget: "Rs 3,500,000", team: 6, progress: 55, startDate: "2023-12-10", deadline: "2024-03-15", status: "in-progress" },
+  { id: "PRJ-010", name: "Payment Gateway", client: "Gujranwala Fintech", budget: "Rs 4,800,000", team: 8, progress: 70, startDate: "2023-11-05", deadline: "2024-02-25", status: "in-progress" },
 ];
 
 interface Project {
   id: string;
   name: string;
   client: string;
+  budget: string;
+  team: number;
   progress: number;
+  startDate: string;
   deadline: string;
   status: string;
 }
 
 export default function Projects() {
   const [open, setOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState(initialProjects);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [client, setClient] = useState("");
   const [deadline, setDeadline] = useState("");
   const [progress, setProgress] = useState("0");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         project.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || project.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProjects = filteredProjects.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
 
   const handleCreate = () => {
     if (!name || !client || !deadline) {
@@ -66,7 +128,10 @@ export default function Projects() {
         id: `PRJ-${Date.now().toString().slice(-6)}`,
         name,
         client,
+        budget: "Rs 0",
+        team: 0,
         progress: prog,
+        startDate: new Date().toISOString().split('T')[0],
         deadline,
         status
       };

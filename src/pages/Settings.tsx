@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Building2, Bell, Shield, Palette, Database, Mail, Globe } from "lucide-react";
+import { Building2, Bell, Shield, Palette, Database, Mail, Globe, Save, Download, Upload, Trash2, Key, Users as UsersIcon } from "lucide-react";
+import { showSuccess } from "@/lib/toast";
 
 export default function Settings() {
   return (
@@ -57,7 +58,10 @@ export default function Settings() {
                 <Input id="zip" defaultValue="75300" />
               </div>
             </div>
-            <Button className="bg-gradient-primary">Save Changes</Button>
+            <Button className="bg-gradient-primary">
+              <Save className="mr-2 h-4 w-4" />
+              Save Changes
+            </Button>
           </CardContent>
         </Card>
 
@@ -134,7 +138,10 @@ export default function Settings() {
             <div className="space-y-2">
               <Label htmlFor="password">Change Password</Label>
               <Input id="password" type="password" placeholder="Enter new password" />
-              <Button variant="outline">Update Password</Button>
+              <Button variant="outline">
+                <Key className="mr-2 h-4 w-4" />
+                Update Password
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -183,6 +190,135 @@ export default function Settings() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Data Management */}
+        <Card className="shadow-soft">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-primary" />
+              <CardTitle>Data Management</CardTitle>
+            </div>
+            <CardDescription>Backup, export, and manage your data</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button variant="outline" className="justify-start">
+                <Download className="mr-2 h-4 w-4" />
+                Export Data
+              </Button>
+              <Button variant="outline" className="justify-start">
+                <Upload className="mr-2 h-4 w-4" />
+                Import Data
+              </Button>
+              <Button variant="outline" className="justify-start">
+                <Database className="mr-2 h-4 w-4" />
+                Backup Now
+              </Button>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Automatic Backups</Label>
+                <p className="text-sm text-muted-foreground">Daily automatic data backups</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <Separator />
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Trash2 className="h-5 w-5 text-destructive mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-destructive mb-1">Danger Zone</h4>
+                  <p className="text-sm text-muted-foreground mb-3">Permanently delete all data. This action cannot be undone.</p>
+                  <Button variant="destructive" size="sm">
+                    Delete All Data
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Email Configuration */}
+        <Card className="shadow-soft">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-primary" />
+              <CardTitle>Email Configuration</CardTitle>
+            </div>
+            <CardDescription>Configure email settings for notifications and invoices</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="smtp-host">SMTP Host</Label>
+                <Input id="smtp-host" placeholder="smtp.gmail.com" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="smtp-port">SMTP Port</Label>
+                <Input id="smtp-port" placeholder="587" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="smtp-user">SMTP Username</Label>
+                <Input id="smtp-user" placeholder="your-email@gmail.com" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="smtp-pass">SMTP Password</Label>
+                <Input id="smtp-pass" type="password" placeholder="••••••••" />
+              </div>
+            </div>
+            <Button className="bg-gradient-primary">
+              <Save className="mr-2 h-4 w-4" />
+              Save Email Settings
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* User Permissions */}
+        <Card className="shadow-soft">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <UsersIcon className="h-5 w-5 text-primary" />
+              <CardTitle>User Permissions</CardTitle>
+            </div>
+            <CardDescription>Manage user roles and access levels</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Sales Module Access</Label>
+                <p className="text-sm text-muted-foreground">Allow users to access sales features</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Purchase Module Access</Label>
+                <p className="text-sm text-muted-foreground">Allow users to access purchase features</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Inventory Management</Label>
+                <p className="text-sm text-muted-foreground">Allow users to manage inventory</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Financial Reports</Label>
+                <p className="text-sm text-muted-foreground">Allow users to view financial reports</p>
+              </div>
+              <Switch />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

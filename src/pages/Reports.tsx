@@ -1,7 +1,8 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { FileBarChart, TrendingUp, DollarSign, Users, Package, ShoppingCart, FileText, Download } from "lucide-react";
+import { FileBarChart, TrendingUp, DollarSign, Users, Package, ShoppingCart, FileText, Download, Calendar, BarChart3, PieChart, FileSpreadsheet, Printer, Eye } from "lucide-react";
+import { showSuccess } from "@/lib/toast";
 
 const reportCategories = [
   {
@@ -71,7 +72,18 @@ const reportCategories = [
   },
 ];
 
+const quickStats = [
+  { title: "Reports Generated", value: "1,234", icon: FileBarChart, color: "text-primary", bgColor: "bg-blue-500/10" },
+  { title: "This Month", value: "89", icon: Calendar, color: "text-success", bgColor: "bg-green-500/10" },
+  { title: "Scheduled", value: "12", icon: BarChart3, color: "text-warning", bgColor: "bg-yellow-500/10" },
+  { title: "Custom Reports", value: "24", icon: PieChart, color: "text-primary", bgColor: "bg-purple-500/10" },
+];
+
 export default function Reports() {
+  const handleDownload = (reportName: string) => {
+    showSuccess(`Downloading ${reportName}...`);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -87,6 +99,25 @@ export default function Reports() {
             <FileBarChart className="mr-2 h-4 w-4" />
             Create Custom Report
           </Button>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+          {quickStats.map((stat) => (
+            <Card key={stat.title} className="shadow-soft hover:shadow-elevated transition-all duration-300 hover:scale-105">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </CardTitle>
+                <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${stat.bgColor}`}>
+                  <stat.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg sm:text-xl xl:text-2xl font-bold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Report Categories */}
@@ -109,15 +140,26 @@ export default function Reports() {
                   {category.reports.map((report) => (
                     <div
                       key={report.name}
-                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors group"
                     >
-                      <div>
-                        <p className="text-sm font-medium">{report.name}</p>
-                        <p className="text-xs text-muted-foreground">Last: {report.lastGenerated}</p>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium group-hover:text-primary transition-colors">{report.name}</p>
+                        <p className="text-xs text-muted-foreground">Last generated: {report.lastGenerated}</p>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="View">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Download PDF" onClick={() => handleDownload(report.name)}>
+                          <Download className="h-4 w-4 text-red-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Export Excel">
+                          <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Print">
+                          <Printer className="h-4 w-4 text-gray-600" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>

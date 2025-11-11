@@ -9,21 +9,51 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Users, UserCheck, Building2, Mail, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Users, UserCheck, Building2, Mail, Eye, Edit, Trash2, FileSpreadsheet, FileDown, ArrowUpRight, ArrowDownRight, Search, Phone, DollarSign, TrendingUp } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from "recharts";
+import { exportToPDF, exportToExcel, exportSingleRecordPDF } from "@/lib/pdfExport";
 
 const stats = [
-  { title: "Total Parties", value: "487", icon: Users, color: "text-primary" },
-  { title: "Customers", value: "342", icon: UserCheck, color: "text-success" },
-  { title: "Vendors", value: "145", icon: Building2, color: "text-primary" },
-  { title: "Active Contacts", value: "423", icon: Mail, color: "text-success" },
+  { title: "Total Parties", value: "487", change: "+23", trend: "up", icon: Users, color: "text-success", bgColor: "bg-blue-500/10" },
+  { title: "Customers", value: "342", change: "+18", trend: "up", icon: UserCheck, color: "text-success", bgColor: "bg-green-500/10" },
+  { title: "Vendors", value: "145", change: "+5", trend: "up", icon: Building2, color: "text-primary", bgColor: "bg-purple-500/10" },
+  { title: "Active Contacts", value: "423", change: "+20", trend: "up", icon: Mail, color: "text-success", bgColor: "bg-yellow-500/10" },
+  { title: "Receivables", value: "Rs 45M", change: "+8.5%", trend: "up", icon: DollarSign, color: "text-success", bgColor: "bg-pink-500/10" },
+  { title: "Payables", value: "Rs 22M", change: "-3.2%", trend: "down", icon: DollarSign, color: "text-warning", bgColor: "bg-orange-500/10" },
+];
+
+const partyTypeData = [
+  { name: "Customers", value: 342, color: "hsl(142, 76%, 36%)" },
+  { name: "Vendors", value: 145, color: "hsl(var(--primary))" },
+];
+
+const monthlyTransactions = [
+  { month: "Jan", customers: 28, vendors: 12 },
+  { month: "Feb", customers: 32, vendors: 15 },
+  { month: "Mar", customers: 25, vendors: 10 },
+  { month: "Apr", customers: 38, vendors: 18 },
+  { month: "May", customers: 35, vendors: 14 },
+  { month: "Jun", customers: 42, vendors: 20 },
+];
+
+const balanceData = [
+  { range: "0-500K", count: 180 },
+  { range: "500K-1M", count: 142 },
+  { range: "1M-5M", count: 98 },
+  { range: "5M+", count: 67 },
 ];
 
 const initialParties = [
-  { id: "PTY-001", name: "Karachi Corporation", type: "customer", email: "contact@karachicorp.pk", phone: "+92 21 3456 7890", balance: "Rs 1,250,000" },
-  { id: "PTY-002", name: "Lahore Tech Solutions", type: "customer", email: "info@lahoretech.pk", phone: "+92 42 3567 8901", balance: "Rs 820,000" },
-  { id: "PTY-003", name: "Islamabad Suppliers", type: "vendor", email: "sales@isb-suppliers.pk", phone: "+92 51 2345 6789", balance: "Rs -540,000" },
-  { id: "PTY-004", name: "Pakistan Industries", type: "customer", email: "contact@pakindustries.pk", phone: "+92 21 4567 8901", balance: "Rs 1,580,000" },
-  { id: "PTY-005", name: "Faisalabad Wholesale", type: "vendor", email: "orders@fsd-wholesale.pk", phone: "+92 41 2678 9012", balance: "Rs -320,000" },
+  { id: "PTY-001", name: "Karachi Corporation", type: "customer", email: "contact@karachicorp.pk", phone: "+92 21 3456 7890", address: "Karachi, Pakistan", balance: "Rs 1,250,000", lastTransaction: "2024-01-15" },
+  { id: "PTY-002", name: "Lahore Tech Solutions", type: "customer", email: "info@lahoretech.pk", phone: "+92 42 3567 8901", address: "Lahore, Pakistan", balance: "Rs 820,000", lastTransaction: "2024-01-14" },
+  { id: "PTY-003", name: "Islamabad Suppliers", type: "vendor", email: "sales@isb-suppliers.pk", phone: "+92 51 2345 6789", address: "Islamabad, Pakistan", balance: "Rs -540,000", lastTransaction: "2024-01-13" },
+  { id: "PTY-004", name: "Pakistan Industries", type: "customer", email: "contact@pakindustries.pk", phone: "+92 21 4567 8901", address: "Karachi, Pakistan", balance: "Rs 1,580,000", lastTransaction: "2024-01-12" },
+  { id: "PTY-005", name: "Faisalabad Wholesale", type: "vendor", email: "orders@fsd-wholesale.pk", phone: "+92 41 2678 9012", address: "Faisalabad, Pakistan", balance: "Rs -320,000", lastTransaction: "2024-01-11" },
+  { id: "PTY-006", name: "Multan Traders", type: "customer", email: "info@multantraders.pk", phone: "+92 61 4567 8901", address: "Multan, Pakistan", balance: "Rs 950,000", lastTransaction: "2024-01-10" },
+  { id: "PTY-007", name: "Peshawar Suppliers", type: "vendor", email: "sales@peshawarsupply.pk", phone: "+92 91 2345 6789", address: "Peshawar, Pakistan", balance: "Rs -280,000", lastTransaction: "2024-01-09" },
+  { id: "PTY-008", name: "Quetta Enterprises", type: "customer", email: "contact@quettaent.pk", phone: "+92 81 3456 7890", address: "Quetta, Pakistan", balance: "Rs 1,120,000", lastTransaction: "2024-01-08" },
+  { id: "PTY-009", name: "Sialkot Vendors", type: "vendor", email: "orders@sialkotvendors.pk", phone: "+92 52 4567 8901", address: "Sialkot, Pakistan", balance: "Rs -450,000", lastTransaction: "2024-01-07" },
+  { id: "PTY-010", name: "Gujranwala Corp", type: "customer", email: "info@gujranwalacorp.pk", phone: "+92 55 2345 6789", address: "Gujranwala, Pakistan", balance: "Rs 780,000", lastTransaction: "2024-01-06" },
 ];
 
 interface Party {
@@ -32,17 +62,47 @@ interface Party {
   type: string;
   email: string;
   phone: string;
+  address: string;
   balance: string;
+  lastTransaction: string;
 }
 
 export default function Parties() {
   const [open, setOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedParty, setSelectedParty] = useState<Party | null>(null);
   const [parties, setParties] = useState(initialParties);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const filteredParties = parties.filter(party => {
+    const matchesSearch = party.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         party.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         party.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = typeFilter === "all" || party.type === typeFilter;
+    return matchesSearch && matchesType;
+  });
+
+  const totalPages = Math.ceil(filteredParties.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedParties = filteredParties.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handleTypeChange = (value: string) => {
+    setTypeFilter(value);
+    setCurrentPage(1);
+  };
 
   const handleCreate = () => {
     if (!name || !type || !email) {
@@ -64,7 +124,9 @@ export default function Parties() {
         type,
         email,
         phone,
-        balance: "Rs 0"
+        address: "",
+        balance: "Rs 0",
+        lastTransaction: new Date().toISOString().split('T')[0]
       };
       setParties([newParty, ...parties]);
       showSuccess("Party added successfully!");
