@@ -23,6 +23,7 @@ import Settings from "./pages/Settings";
 import UserManagement from "./pages/UserManagement";
 import Profile from "./pages/Profile";
 import DataManagement from "./pages/DataManagement";
+import InvoiceTemplates from "./pages/InvoiceTemplates";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/data-management" element={<ProtectedRoute><DataManagement /></ProtectedRoute>} />
+          <Route path="/invoice-templates" element={<ProtectedRoute><InvoiceTemplates /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
