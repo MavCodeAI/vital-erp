@@ -24,6 +24,8 @@ import UserManagement from "./pages/UserManagement";
 import Profile from "./pages/Profile";
 import DataManagement from "./pages/DataManagement";
 import InvoiceTemplates from "./pages/InvoiceTemplates";
+import ReorderManagement from "./pages/ReorderManagement";
+import BarcodeScanner from "./pages/BarcodeScanner";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -57,6 +59,8 @@ const App = () => (
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/data-management" element={<ProtectedRoute><DataManagement /></ProtectedRoute>} />
           <Route path="/invoice-templates" element={<ProtectedRoute><InvoiceTemplates /></ProtectedRoute>} />
+          <Route path="/reorder-management" element={<ProtectedRoute><ReorderManagement /></ProtectedRoute>} />
+          <Route path="/barcode-scanner" element={<ProtectedRoute><BarcodeScanner /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
