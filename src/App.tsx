@@ -1,54 +1,63 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { DashboardSkeleton } from "./components/SkeletonLoader";
+
+// Eager load critical pages
 import Landing from "./pages/Landing";
-import Features from "./pages/Features";
-import Pricing from "./pages/Pricing";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import Sales from "./pages/Sales";
-import Purchase from "./pages/Purchase";
-import Inventory from "./pages/Inventory";
-import Accounting from "./pages/Accounting";
-import HR from "./pages/HR";
-import Projects from "./pages/Projects";
-import CRM from "./pages/CRM";
-import Parties from "./pages/Parties";
-import Reports from "./pages/Reports";
-import Settings from "./pages/Settings";
-import UserManagement from "./pages/UserManagement";
-import Profile from "./pages/Profile";
-import DataManagement from "./pages/DataManagement";
-import InvoiceTemplates from "./pages/InvoiceTemplates";
-import ReorderManagement from "./pages/ReorderManagement";
-import BarcodeScanner from "./pages/BarcodeScanner";
-import WarehouseTransfers from "./pages/WarehouseTransfers";
-import ThreeWayMatching from "./pages/ThreeWayMatching";
-import NotFound from "./pages/NotFound";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+
+// Lazy load all other pages
+const Features = lazy(() => import("./pages/Features"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Sales = lazy(() => import("./pages/Sales"));
+const Purchase = lazy(() => import("./pages/Purchase"));
+const Inventory = lazy(() => import("./pages/Inventory"));
+const Accounting = lazy(() => import("./pages/Accounting"));
+const HR = lazy(() => import("./pages/HR"));
+const Projects = lazy(() => import("./pages/Projects"));
+const CRM = lazy(() => import("./pages/CRM"));
+const Parties = lazy(() => import("./pages/Parties"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Settings = lazy(() => import("./pages/Settings"));
+const UserManagement = lazy(() => import("./pages/UserManagement"));
+const Profile = lazy(() => import("./pages/Profile"));
+const DataManagement = lazy(() => import("./pages/DataManagement"));
+const InvoiceTemplates = lazy(() => import("./pages/InvoiceTemplates"));
+const ReorderManagement = lazy(() => import("./pages/ReorderManagement"));
+const BarcodeScanner = lazy(() => import("./pages/BarcodeScanner"));
+const WarehouseTransfers = lazy(() => import("./pages/WarehouseTransfers"));
+const ThreeWayMatching = lazy(() => import("./pages/ThreeWayMatching"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -73,12 +82,14 @@ const App = () => (
           <Route path="/barcode-scanner" element={<ProtectedRoute><BarcodeScanner /></ProtectedRoute>} />
           <Route path="/warehouse-transfers" element={<ProtectedRoute><WarehouseTransfers /></ProtectedRoute>} />
           <Route path="/three-way-matching" element={<ProtectedRoute><ThreeWayMatching /></ProtectedRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

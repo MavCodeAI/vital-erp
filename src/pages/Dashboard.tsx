@@ -100,35 +100,52 @@ export default function Dashboard() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Welcome back! Here's what's happening with your business today.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+              Dashboard
+            </h1>
+            <p className="text-base text-muted-foreground mt-2">
+              Welcome back! Here's what's happening with your business today.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
+              <p className="text-xs text-muted-foreground">Today</p>
+              <p className="text-lg font-bold text-primary">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+            </div>
+          </div>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {kpis.map((kpi) => (
-            <Card key={kpi.title} className="shadow-soft hover:shadow-elevated transition-all duration-300 hover:scale-105">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {kpis.map((kpi, index) => (
+            <Card 
+              key={kpi.title} 
+              className="relative overflow-hidden border-2 hover:border-primary/50 shadow-soft hover:shadow-floating transition-all duration-500 hover:-translate-y-1 group"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
+                <CardTitle className="text-sm font-semibold text-muted-foreground">
                   {kpi.title}
                 </CardTitle>
-                <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${kpi.bgColor}`}>
-                  <kpi.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${kpi.bgColor} group-hover:scale-110 transition-transform shadow-lg`}>
+                  <kpi.icon className="h-6 w-6 text-primary" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl xl:text-2xl font-bold">{kpi.value}</div>
-                <div className="flex items-center gap-1 text-xs mt-1">
-                  {kpi.trend === "up" ? (
-                    <ArrowUpRight className={`h-3 w-3 ${kpi.color}`} />
-                  ) : (
-                    <ArrowDownRight className={`h-3 w-3 ${kpi.color}`} />
-                  )}
-                  <span className={kpi.color}>{kpi.change}</span>
-                  <span className="text-muted-foreground hidden lg:inline">vs last month</span>
+              <CardContent className="relative z-10">
+                <div className="text-2xl xl:text-3xl font-black mb-2">{kpi.value}</div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${kpi.trend === 'up' ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                    {kpi.trend === "up" ? (
+                      <ArrowUpRight className={`h-4 w-4 ${kpi.color}`} />
+                    ) : (
+                      <ArrowDownRight className={`h-4 w-4 ${kpi.color}`} />
+                    )}
+                    <span className={`font-bold ${kpi.color}`}>{kpi.change}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">vs last month</span>
                 </div>
               </CardContent>
             </Card>
@@ -136,11 +153,13 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          <Card className="shadow-soft lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <Card className="shadow-elevated border-2 hover:border-primary/30 transition-all lg:col-span-2">
+            <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-primary" />
+                </div>
                 Revenue & Profit Overview
               </CardTitle>
             </CardHeader>
