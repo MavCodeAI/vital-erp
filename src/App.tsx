@@ -6,7 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Sales from "./pages/Sales";
 import Purchase from "./pages/Purchase";
 import Inventory from "./pages/Inventory";
@@ -18,7 +21,9 @@ import Parties from "./pages/Parties";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import UserManagement from "./pages/UserManagement";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -32,18 +37,22 @@ const App = () => (
           <Route path="/" element={<Welcome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/sales" element={<Sales />} />
-          <Route path="/purchase" element={<Purchase />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/accounting" element={<Accounting />} />
-          <Route path="/hr" element={<HR />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/crm" element={<CRM />} />
-          <Route path="/parties" element={<Parties />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/sales" element={<ProtectedRoute><Sales /></ProtectedRoute>} />
+          <Route path="/purchase" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+          <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
+          <Route path="/accounting" element={<ProtectedRoute><Accounting /></ProtectedRoute>} />
+          <Route path="/hr" element={<ProtectedRoute><HR /></ProtectedRoute>} />
+          <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+          <Route path="/crm" element={<ProtectedRoute><CRM /></ProtectedRoute>} />
+          <Route path="/parties" element={<ProtectedRoute><Parties /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

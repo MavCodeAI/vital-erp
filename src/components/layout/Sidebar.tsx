@@ -10,11 +10,15 @@ import {
   Building2, 
   FileBarChart, 
   Settings,
-  X
+  X,
+  User,
+  LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { showSuccess } from "@/lib/toast";
 
 const modules = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -36,6 +40,20 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear authentication
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("rememberMe");
+    
+    showSuccess("Logged out successfully!");
+    
+    // Redirect to login
+    navigate("/login");
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -91,17 +109,32 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         </nav>
 
-        {/* User */}
-        <div className="border-t border-sidebar-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground font-semibold">
-              A
+        {/* User Profile & Logout */}
+        <div className="border-t border-sidebar-border p-4 space-y-2">
+          <NavLink
+            to="/profile"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full"
+            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+            onClick={onClose}
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary text-white font-semibold text-xs">
+              AK
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">Admin User</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">admin@erpmax.com</p>
+              <p className="text-sm font-medium truncate">Ahmed Khan</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate">admin@erpmax.pk</p>
             </div>
-          </div>
+            <User className="h-4 w-4" />
+          </NavLink>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </Button>
         </div>
       </div>
     </aside>
