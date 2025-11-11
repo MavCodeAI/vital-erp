@@ -53,21 +53,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
       <div className="flex h-full flex-col">
-        {/* Logo & Close Button */}
+        {/* Header with Close Button */}
         <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary">
-              <LayoutDashboard className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-sidebar-foreground">ErpMax</h1>
-              <p className="text-xs text-sidebar-foreground/60">Enterprise Suite</p>
-            </div>
+            <span className="text-lg font-semibold text-sidebar-foreground">Navigation</span>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="lg:hidden hover:bg-sidebar-accent"
             onClick={onClose}
           >
             <X className="h-5 w-5" />
