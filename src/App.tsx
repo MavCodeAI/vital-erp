@@ -26,6 +26,8 @@ import DataManagement from "./pages/DataManagement";
 import InvoiceTemplates from "./pages/InvoiceTemplates";
 import ReorderManagement from "./pages/ReorderManagement";
 import BarcodeScanner from "./pages/BarcodeScanner";
+import WarehouseTransfers from "./pages/WarehouseTransfers";
+import ThreeWayMatching from "./pages/ThreeWayMatching";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -61,6 +63,8 @@ const App = () => (
           <Route path="/invoice-templates" element={<ProtectedRoute><InvoiceTemplates /></ProtectedRoute>} />
           <Route path="/reorder-management" element={<ProtectedRoute><ReorderManagement /></ProtectedRoute>} />
           <Route path="/barcode-scanner" element={<ProtectedRoute><BarcodeScanner /></ProtectedRoute>} />
+          <Route path="/warehouse-transfers" element={<ProtectedRoute><WarehouseTransfers /></ProtectedRoute>} />
+          <Route path="/three-way-matching" element={<ProtectedRoute><ThreeWayMatching /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
