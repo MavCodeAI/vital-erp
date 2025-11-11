@@ -1,6 +1,7 @@
 import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NotificationsCenter } from "@/components/NotificationsCenter";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -30,6 +31,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           />
         </div>
       </div>
+
+      {/* Notifications */}
+      <NotificationsCenter />
     </header>
   );
 }
