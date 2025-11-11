@@ -539,7 +539,7 @@ export default function CRM() {
                       <TableCell>{lead.source}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" title="View">
+                          <Button variant="ghost" size="icon" title="View" onClick={() => handleViewLead(lead)}>
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="icon" title="Edit" onClick={() => handleEdit(lead)}>
@@ -551,7 +551,14 @@ export default function CRM() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No leads found
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
