@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { showSuccess } from "@/lib/toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -21,11 +22,28 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
+  const handleLogout = async () => {
+    await signOut();
     showSuccess("Logged out successfully!");
     navigate("/login");
+  };
+
+  const getUserInitials = () => {
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name
+        .split(' ')
+        .map((name: string) => name[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
+
+  const getDisplayName = () => {
+    return user?.user_metadata?.full_name || user?.email || 'User';
   };
 
   return (
@@ -79,7 +97,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-primary/10">
               <Avatar className="h-10 w-10 border-2 border-primary/20">
                 <AvatarFallback className="bg-gradient-primary text-white font-bold">
-                  AD
+                  {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -87,9 +105,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Admin User</p>
+                <p className="text-sm font-medium leading-none">{getDisplayName()}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  admin@erpmax.com
+                  {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -103,7 +121,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

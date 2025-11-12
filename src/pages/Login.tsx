@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/lib/toast";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Building2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -53,26 +54,31 @@ export default function Login() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Demo credentials check
-      if (email === "admin@erpmax.pk" && password === "admin123") {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        showError(error.message);
+        return;
+      }
+
+      if (data.user) {
         showSuccess("Login successful! Welcome back.");
         
-        // Store user info (in real app, use proper auth tokens)
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("userEmail", email);
         if (rememberMe) {
           localStorage.setItem("rememberMe", "true");
         }
         
-        // Redirect to dashboard
         navigate("/dashboard");
-      } else {
-        showError("Invalid email or password. Try admin@erpmax.pk / admin123");
-        setIsLoading(false);
       }
-    }, 1500);
+    } catch (error) {
+      showError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -201,9 +207,8 @@ export default function Login() {
 
               {/* Demo Credentials */}
               <div className="bg-muted/50 border border-muted rounded-lg p-3 text-sm">
-                <p className="font-semibold mb-1">Demo Credentials:</p>
-                <p className="text-muted-foreground">Email: admin@erpmax.pk</p>
-                <p className="text-muted-foreground">Password: admin123</p>
+                <p className="font-semibold mb-1">Note:</p>
+                <p className="text-muted-foreground">Use your Supabase account credentials to login.</p>
               </div>
 
               {/* Sign Up Link */}

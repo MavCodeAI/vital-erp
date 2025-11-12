@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/lib/toast";
 import { Eye, EyeOff, Mail, Lock, User, Building2, Phone, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -123,16 +124,33 @@ export default function Signup() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      showSuccess("Account created successfully! Please login.");
-      
-      // Store registration info (in real app, this would be handled by backend)
-      localStorage.setItem("registeredEmail", formData.email);
-      
-      // Redirect to login
-      navigate("/login");
-    }, 2000);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            phone: formData.phone,
+            company_name: formData.companyName,
+          },
+        },
+      });
+
+      if (error) {
+        showError(error.message);
+        return;
+      }
+
+      if (data.user) {
+        showSuccess("Account created successfully! Please check your email to verify.");
+        navigate("/login");
+      }
+    } catch (error) {
+      showError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

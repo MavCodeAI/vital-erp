@@ -1,7 +1,59 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp, ShoppingCart, Package, Users, FileText, AlertCircle, CheckCircle2, Clock, Activity } from "lucide-react";
+import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Users, 
+  DollarSign, 
+  ShoppingCart, 
+  TrendingUp, 
+  TrendingDown, 
+  Target,
+  CheckCircle2,
+  ArrowUpRight,
+  ArrowDownRight,
+  Package,
+  FileText,
+  Activity,
+  Clock
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseQuery } from "@/hooks/useSupabaseQuery";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar
+} from "recharts";
+
+// Type definitions for database entities
+interface Profile {
+  id: string;
+  full_name: string | null;
+  email: string;
+  created_at: string;
+  avatar_url: string | null;
+  tenant_id: string;
+}
+
+interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+  is_active: boolean;
+  settings: Record<string, unknown>;
+}
 
 const revenueData = [
   { month: "Jan", revenue: 45000, expenses: 32000, profit: 13000 },
@@ -96,6 +148,17 @@ const kpis = [
 ];
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  
+  const { data: profiles, isLoading: profilesLoading } = useSupabaseQuery<Profile>('profiles', {
+    select: 'id, full_name, email, created_at',
+    limit: 10
+  });
+
+  const { data: tenants, isLoading: tenantsLoading } = useSupabaseQuery<Tenant>('tenants', {
+    select: 'id, name, is_active, created_at',
+    filter: { is_active: true }
+  });
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -106,7 +169,7 @@ export default function Dashboard() {
               Dashboard
             </h1>
             <p className="text-base text-muted-foreground mt-2">
-              Welcome back! Here's what's happening with your business today.
+              Welcome back, {user?.user_metadata?.full_name || 'User'}! Here's what's happening with your business today.
             </p>
           </div>
           <div className="flex gap-2">
@@ -279,89 +342,68 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                Recent Activity
+                Recent Users
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { icon: ShoppingCart, title: "New order received", desc: "Order #INV-1001 from Acme Corp", time: "2h ago", color: "bg-blue-500/10 text-blue-600" },
-                  { icon: CheckCircle2, title: "Payment confirmed", desc: "Invoice #INV-998 - Rs 45,000", time: "3h ago", color: "bg-green-500/10 text-green-600" },
-                  { icon: Package, title: "Stock alert", desc: "Low inventory for Product XYZ", time: "5h ago", color: "bg-orange-500/10 text-orange-600" },
-                  { icon: Users, title: "New customer registered", desc: "Tech Solutions Pvt Ltd", time: "6h ago", color: "bg-purple-500/10 text-purple-600" },
-                  { icon: AlertCircle, title: "Pending approval", desc: "Purchase order #PO-445", time: "8h ago", color: "bg-red-500/10 text-red-600" },
-                ].map((activity, i) => (
-                  <div key={i} className="flex items-start gap-3 sm:gap-4 pb-4 border-b last:border-0 last:pb-0 hover:bg-muted/50 p-2 rounded-lg transition-colors">
-                    <div className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full ${activity.color} flex-shrink-0`}>
-                      <activity.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{activity.title}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{activity.desc}</p>
-                    </div>
-                    <div className="text-xs text-muted-foreground whitespace-nowrap">{activity.time}</div>
+                {profilesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
-                ))}
+                ) : profiles && profiles.length > 0 ? (
+                  profiles.map((profile, i) => (
+                    <div key={profile.id} className="flex items-start gap-3 sm:gap-4 pb-4 border-b last:border-0 last:pb-0 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                      <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-purple-500/10 text-purple-600 flex-shrink-0">
+                        <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{profile.full_name || 'Unknown User'}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{profile.email}</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(profile.created_at || '').toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No users found</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
 
           <Card className="shadow-soft">
             <CardHeader>
-              <CardTitle>Quick Stats</CardTitle>
+              <CardTitle>Active Tenants</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Orders Today</span>
-                    <span className="font-bold">47</span>
+                {tenantsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: '78%' }} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Revenue Today</span>
-                    <span className="font-bold">Rs 125K</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500" style={{ width: '65%' }} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Target Progress</span>
-                    <span className="font-bold">82%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500" style={{ width: '82%' }} />
-                  </div>
-                </div>
-                <div className="pt-4 space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium">Completed</span>
+                ) : tenants && tenants.length > 0 ? (
+                  tenants.slice(0, 5).map((tenant) => (
+                    <div key={tenant.id} className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium">{tenant.name}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(tenant.created_at || '').toLocaleDateString()}
+                      </span>
                     </div>
-                    <span className="text-sm font-bold">145</span>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No active tenants</p>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-yellow-600" />
-                      <span className="text-sm font-medium">Pending</span>
-                    </div>
-                    <span className="text-sm font-bold">58</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-red-500/10 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-red-600" />
-                      <span className="text-sm font-medium">Urgent</span>
-                    </div>
-                    <span className="text-sm font-bold">12</span>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -3,13 +3,13 @@
 interface ExportColumn {
   header: string;
   key: string;
-  format?: (value: any) => string;
+  format?: (value: unknown) => string;
 }
 
 interface ExportOptions {
   title: string;
   columns: ExportColumn[];
-  data: any[];
+  data: unknown[];
   filename?: string;
   showDate?: boolean;
   companyName?: string;
@@ -177,7 +177,7 @@ export const exportSingleRecordPDF = (options: {
 
 export const exportToExcel = (options: {
   columns: ExportColumn[];
-  data: any[];
+  data: unknown[];
   filename?: string;
 }) => {
   const { columns, data, filename = 'export' } = options;
