@@ -31,14 +31,14 @@ export function FileUpload({
     setIsDragging(false);
   }, []);
 
-  const validateFile = (file: File): boolean => {
+  const validateFile = useCallback((file: File): boolean => {
     const maxSizeBytes = maxSize * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       showError(`File ${file.name} exceeds ${maxSize}MB limit`);
       return false;
     }
     return true;
-  };
+  }, [maxSize]);
 
   const simulateUpload = (file: File) => {
     let progress = 0;
@@ -65,7 +65,7 @@ export function FileUpload({
       validFiles.forEach(simulateUpload);
       onUpload?.(validFiles);
     }
-  }, [onUpload, maxSize]);
+  }, [onUpload, maxSize, validateFile]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);

@@ -18,22 +18,15 @@ interface SalesData {
   orders: number;
 }
 
-// Mock sales data - replace with actual data when sales table exists
-const mockSales = [
-  { total_amount: 125000, created_at: '2024-01-15' },
-  { total_amount: 85000, created_at: '2024-01-16' },
-  { total_amount: 210000, created_at: '2024-01-17' }
-];
-
 export function SalesChart() {
-  // Using mock data for now - replace with actual Supabase query when sales table exists
-  const { data: sales = mockSales, isLoading } = useSupabaseQuery('sales', {
+  // Using real invoice data from Supabase
+  const { data: invoices = [], isLoading } = useSupabaseQuery('invoices', {
     select: 'total_amount, created_at',
     orderBy: { column: 'created_at', ascending: true }
   });
 
   const processChartData = (): SalesData[] => {
-    if (!sales || sales.length === 0) return [];
+    if (!invoices || invoices.length === 0) return [];
 
     const last30Days = Array.from({ length: 30 }, (_, i) => {
       const date = new Date();
@@ -42,8 +35,8 @@ export function SalesChart() {
     });
 
     return last30Days.map(date => {
-      const daySales = sales.filter((sale: { created_at?: string }) => 
-        sale.created_at && sale.created_at.startsWith(date)
+      const dayInvoices = invoices.filter((invoice: { created_at?: string }) => 
+        invoice.created_at && invoice.created_at.startsWith(date)
       );
       
       return {
@@ -51,8 +44,8 @@ export function SalesChart() {
           month: 'short', 
           day: 'numeric' 
         }),
-        revenue: daySales.reduce((sum: number, sale: { total_amount?: number }) => sum + (sale.total_amount || 0), 0),
-        orders: daySales.length
+        revenue: dayInvoices.reduce((sum: number, invoice: { total_amount?: number }) => sum + (invoice.total_amount || 0), 0),
+        orders: dayInvoices.length
       };
     });
   };

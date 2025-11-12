@@ -11,36 +11,28 @@ interface SalesStats {
   ordersChange: number;
 }
 
-// Mock sales data - replace with actual data when sales table exists
-const mockSales = [
-  { total_amount: 125000, status: 'completed' },
-  { total_amount: 85000, status: 'pending' },
-  { total_amount: 210000, status: 'completed' }
-];
-
-// Mock customers data - replace with actual data when customers table exists
-const mockCustomers = [
-  { id: '1', created_at: '2024-01-01' },
-  { id: '2', created_at: '2024-01-02' }
-];
-
 export function SalesStats() {
-  // Using mock data for now - replace with actual Supabase queries when tables exist
-  const { data: sales = mockSales, isLoading } = useSupabaseQuery('sales', {
-    select: 'total_amount, status, created_at'
+  // Fetch real invoice data with customer information
+  const { data: invoices = [], isLoading } = useSupabaseQuery('invoices', {
+    select: `
+      *,
+      customer:customers(name, email)
+    `,
+    orderBy: { column: 'created_at', ascending: false }
   });
 
-  const { data: customers = mockCustomers } = useSupabaseQuery('customers', {
+  // Fetch customer count for conversion rate calculation
+  const { data: customers = [] } = useSupabaseQuery('customers', {
     select: 'id, created_at'
   });
 
   const stats: SalesStats = {
-    totalRevenue: sales?.reduce((sum: number, sale: { total_amount?: number }) => sum + (sale.total_amount || 0), 0) || 0,
-    totalOrders: sales?.length || 0,
-    averageOrderValue: sales?.length ? sales.reduce((sum: number, sale: { total_amount?: number }) => sum + (sale.total_amount || 0), 0) / sales.length : 0,
-    conversionRate: customers?.length ? ((sales?.length || 0) / customers.length) * 100 : 0,
-    revenueChange: 12.5,
-    ordersChange: 8.2
+    totalRevenue: invoices?.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0) || 0,
+    totalOrders: invoices?.length || 0,
+    averageOrderValue: invoices?.length ? invoices.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0) / invoices.length : 0,
+    conversionRate: customers?.length ? ((invoices?.length || 0) / customers.length) * 100 : 0,
+    revenueChange: 12.5, // TODO: Calculate actual change from previous period
+    ordersChange: 8.2    // TODO: Calculate actual change from previous period
   };
 
   const statCards = [

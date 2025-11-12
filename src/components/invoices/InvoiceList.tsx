@@ -4,25 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Edit, 
-  Trash2, 
+import {
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
   Search,
   Filter,
-  Download
+  Download,
+  FileText
 } from "lucide-react";
 import { useSupabaseQuery, useSupabaseMutation } from "@/hooks/useSupabaseQuery";
 import { Invoice } from "@/types/invoice";
+import { showSuccess, showError } from "@/lib/toast";
 
-export function SalesTable() {
+interface InvoiceListProps {
+  onEdit?: (invoice: Invoice) => void;
+  onView?: (invoice: Invoice) => void;
+}
+
+export function InvoiceList({ onEdit, onView }: InvoiceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -38,11 +45,11 @@ export function SalesTable() {
   const deleteInvoice = useSupabaseMutation('invoices', 'delete');
 
   const filteredInvoices = invoices?.filter(invoice => {
-    const matchesSearch = 
+    const matchesSearch =
       invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       invoice.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       invoice.customer?.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
     return matchesSearch && matchesStatus;
   }) || [];
@@ -55,18 +62,29 @@ export function SalesTable() {
       overdue: { variant: "destructive" as const, label: "Overdue" },
       cancelled: { variant: "outline" as const, label: "Cancelled" }
     };
-    const config = variants[status as keyof typeof variants] || variants.pending;
-    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
+    const config = variants[status as keyof typeof variants] || variants.draft;
+    return (
+      <Badge variant={config.variant} className={config.className}>
+        {config.label}
+      </Badge>
+    );
   };
 
   const handleDelete = async (invoice: Invoice) => {
     if (confirm(`Are you sure you want to delete invoice ${invoice.invoice_number}?`)) {
       try {
         await deleteInvoice.mutateAsync({ id: invoice.id });
+        showSuccess("Invoice deleted successfully");
       } catch (error) {
         console.error('Failed to delete invoice:', error);
+        showError("Failed to delete invoice");
       }
     }
+  };
+
+  const handleDownloadPDF = (invoice: Invoice) => {
+    // TODO: Implement PDF download
+    showSuccess("PDF download feature coming soon!");
   };
 
   if (error) {
@@ -74,7 +92,7 @@ export function SalesTable() {
       <Card>
         <CardContent className="p-6">
           <div className="text-center text-destructive">
-            <p>Error loading sales data</p>
+            <p>Error loading invoices</p>
             <p className="text-sm text-muted-foreground">{(error as Error).message}</p>
           </div>
         </CardContent>
@@ -86,11 +104,11 @@ export function SalesTable() {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Sales Orders</CardTitle>
+          <CardTitle>Invoices</CardTitle>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              Export All
             </Button>
           </div>
         </div>
@@ -98,7 +116,7 @@ export function SalesTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search sales..."
+              placeholder="Search invoices..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -141,7 +159,7 @@ export function SalesTable() {
           </div>
         ) : filteredInvoices.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No sales orders found</p>
+            <p className="text-muted-foreground">No invoices found</p>
           </div>
         ) : (
           <div className="rounded-md border">
@@ -150,11 +168,10 @@ export function SalesTable() {
                 <TableRow>
                   <TableHead>Invoice #</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Issue Date</TableHead>
                   <TableHead>Due Date</TableHead>
-                  <TableHead>Items</TableHead>
+                  <TableHead>Amount</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -162,12 +179,16 @@ export function SalesTable() {
                 {filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                    <TableCell>{invoice.customer?.name || 'Unknown Customer'}</TableCell>
-                    <TableCell className="text-muted-foreground">{invoice.customer?.email}</TableCell>
-                    <TableCell>Rs {invoice.total_amount.toLocaleString()}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{invoice.customer?.name || 'Unknown Customer'}</p>
+                        <p className="text-sm text-muted-foreground">{invoice.customer?.email}</p>
+                      </div>
+                    </TableCell>
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                    <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{invoice.items?.length || 0}</TableCell>
+                    <TableCell className="font-medium">Rs {invoice.total_amount.toLocaleString()}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -176,15 +197,19 @@ export function SalesTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onView?.(invoice)}>
                             <Eye className="mr-2 h-4 w-4" />
-                            View
+                            View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEdit?.(invoice)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem onClick={() => handleDownloadPDF(invoice)}>
+                            <FileText className="mr-2 h-4 w-4" />
+                            Download PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => handleDelete(invoice)}
                           >
